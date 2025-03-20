@@ -1,8 +1,11 @@
 import { UserAgent, Registerer} from "sip.js";
 import config from "./sipConfig.js";
+import WS from "ws";
+
+global.WebSocket = WS;
 
 export async function createUserAgent() {
-  const { extension, password, server, wsPort } = config;
+  const { extension, password, server, wsPort, transport } = config;
   const uri = UserAgent.makeURI(`sip:${extension}@${server}`);
   if (!uri) throw new Error(`[ERROR] Invalid SIP URI: ${extension}@${server}`);
 
@@ -11,7 +14,7 @@ export async function createUserAgent() {
     authorizationUsername: extension,
     authorizationPassword: password,
     transportOptions: {
-      server: `ws://${server}:${wsPort}`
+      server: `${transport}://${server}:${wsPort}`
     },
     sessionDescriptionHandlerFactoryOptions: {
       peerConnectionConfiguration: { iceServers: [] },
