@@ -1,5 +1,5 @@
-const createUserAgent = require("./userAgent.js");
-const placeCall = require("./callHandler.js");
+import {createUserAgent} from "./userAgent.js";
+import {placeCall} from "./callHandler.js";
 
 async function main() {
   console.log("[DEBUG] Starting SIP call...");

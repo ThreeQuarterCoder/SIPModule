@@ -1,5 +1,5 @@
 import { UserAgent, Registerer} from "sip.js";
-const config = require("./sipConfig.js");
+import config from "./sipConfig.js";
 
 export async function createUserAgent() {
   const { extension, password, server, wsPort } = config;
