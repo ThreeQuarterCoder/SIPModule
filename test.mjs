@@ -18,6 +18,7 @@ import wrtc from "@roamhq/wrtc";
 import WS from "ws";
 import fs from "fs";
 import wav from "node-wav";
+import { RTCAudioSource } from "@roamhq/wrtc/types/nonstandard";
 
 // For SIP.js WebRTC handling
 global.WebSocket = WS;
@@ -37,7 +38,8 @@ if (!global.navigator.mediaDevices) {
   };
 }
 
-const { RTCAudioSource, RTCAudioSink } = wrtc.nonstandard || {};
+//const { RTCAudioSource, RTCAudioSink } = wrtc.nonstandard || {};
+
 
 // Force 'sendrecv' mode in SDP to enable two-way audio
 async function forceSendRecvModifier(description) {
@@ -91,6 +93,7 @@ async function createUserAgent() {
       peerConnectionConfiguration: {
         iceServers: [] // No STUN/TURN required for local PBX
       },
+      offerOptions: { offerToReceiveAudio: true },
       sessionDescriptionHandlerModifiers: [forceSendRecvModifier]
     }
   });
@@ -165,10 +168,13 @@ function setupSessionAudio(session) {
   // Create outbound audio source track
   const source = new RTCAudioSource();
   const track = source.createTrack();
+  const sender = pc.addTrack(track);
   pc.addTransceiver(track, { direction: "sendrecv" });
 
   // Load and play WAV file
-  const filePath = "C:/Users/conne/Downloads/eyeBeamRecording_250306_190452 (online-audio-converter.com).wav";
+  const filePath = "/Users/krsnadas/sip-node-project/audio.wav";
+
+  //const filePath = "C:/Users/conne/Downloads/eyeBeamRecording_250306_190452 (online-audio-converter.com).wav";
   let { sampleRate, samples } = loadWavPCM(filePath);
 
   // Ensure sample rate is correct
@@ -233,7 +239,8 @@ function setupSessionAudio(session) {
 async function main() {
   console.log("[DEBUG] Starting SIP call...");
   const userAgent = await createUserAgent();
-  const target = "sip:07977743973@192.168.1.7"; // Adjust target
+  const target = "sip:08123558443@192.168.1.7"; // Adjust target
+  //const target = "sip:07977743973@192.168.1.7"; // Adjust target
   placeCall(userAgent, target);
 }
 
