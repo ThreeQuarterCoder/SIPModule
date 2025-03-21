@@ -1,5 +1,12 @@
 import {createUserAgent} from "./userAgent.js";
 import {placeCall} from "./callHandler.js";
+import wrtc from "@roamhq/wrtc";
+
+global.WebSocket = WS;
+global.RTCPeerConnection = wrtc.RTCPeerConnection;
+global.RTCSessionDescription = wrtc.RTCSessionDescription;
+global.RTCIceCandidate = wrtc.RTCIceCandidate;
+global.MediaStream = wrtc.MediaStream;
 
 async function main() {
   console.log("[DEBUG] Starting SIP call...");

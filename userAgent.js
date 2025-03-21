@@ -3,6 +3,10 @@ import config from "./sipConfig.js";
 import WS from "ws";
 
 global.WebSocket = WS;
+global.RTCPeerConnection = wrtc.RTCPeerConnection;
+global.RTCSessionDescription = wrtc.RTCSessionDescription;
+global.RTCIceCandidate = wrtc.RTCIceCandidate;
+global.MediaStream = wrtc.MediaStream;
 
 export async function createUserAgent() {
   const { extension, password, server, wsPort, transport } = config;

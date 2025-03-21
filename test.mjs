@@ -15,10 +15,11 @@ if (typeof global.MediaStreamTrackEvent === "undefined") {
 import { UserAgent, Registerer, Inviter, SessionState } from "sip.js";
 //import wrtc from "wrtc";
 import wrtc from "@roamhq/wrtc";
+//import wrtc from "@koush/wrtc";
 import WS from "ws";
 import fs from "fs";
 import wav from "node-wav";
-import { RTCAudioSource } from "@roamhq/wrtc/types/nonstandard";
+//import { RTCAudioSource } from "@roamhq/wrtc/types/nonstandard";
 
 // For SIP.js WebRTC handling
 global.WebSocket = WS;
@@ -38,7 +39,7 @@ if (!global.navigator.mediaDevices) {
   };
 }
 
-//const { RTCAudioSource, RTCAudioSink } = wrtc.nonstandard || {};
+const { RTCAudioSource, RTCAudioSink } = wrtc.nonstandard || {};
 
 
 // Force 'sendrecv' mode in SDP to enable two-way audio
@@ -75,9 +76,9 @@ function loadWavPCM(filePath) {
 
 // Create & register user agent for SIP communication
 async function createUserAgent() {
-  const extension = "701";
-  const password = "7890";
-  const server = "192.168.1.7"; // PBX IP
+  const extension = "sam111";
+  const password = "Dmbg10ab@@@@";
+  const server = "sam2.pstn.twilio.com"; // PBX IP
 
   const uri = UserAgent.makeURI(`sip:${extension}@${server}`);
   if (!uri) throw new Error(`[ERROR] Invalid SIP URI: ${extension}@${server}`);
@@ -87,7 +88,7 @@ async function createUserAgent() {
     authorizationUsername: extension,
     authorizationPassword: password,
     transportOptions: {
-      server: `ws://${server}:5066`
+      server: `wss://${server}:443`
     },
     sessionDescriptionHandlerFactoryOptions: {
       peerConnectionConfiguration: {
@@ -122,10 +123,7 @@ async function placeCall(userAgent, targetNumber) {
   });
 
   try {
-    await inviter.invite();
-    console.log("[INFO] Outbound call INVITE sent =>", targetNumber);
-
-    inviter.stateChange.on((newState) => {
+    inviter.stateChange.addListener((newState) => {
       console.log("[DEBUG] Call state =>", newState);
       if (newState === SessionState.Established) {
         console.log("[INFO] Call established => Setting up audio");
@@ -134,6 +132,19 @@ async function placeCall(userAgent, targetNumber) {
         console.log("[INFO] Call ended or failed.");
       }
     });
+
+    await inviter.invite();
+    console.log("[INFO] Outbound call INVITE sent =>", targetNumber);
+
+    // inviter.stateChange.on((newState) => {
+    //   console.log("[DEBUG] Call state =>", newState);
+    //   if (newState === SessionState.Established) {
+    //     console.log("[INFO] Call established => Setting up audio");
+    //     setupSessionAudio(inviter);
+    //   } else if (newState === SessionState.Terminated) {
+    //     console.log("[INFO] Call ended or failed.");
+    //   }
+    // });
   } catch (err) {
     console.error("[ERROR] placeCall() failed:", err);
   }
@@ -153,6 +164,7 @@ function setupSessionAudio(session) {
   pc.addEventListener("iceconnectionstatechange", () => {
     console.log("[ICE] Connection State =>", pc.iceConnectionState);
   });
+
 
   // Log inbound audio
   pc.addEventListener("track", (evt) => {
@@ -239,7 +251,7 @@ function setupSessionAudio(session) {
 async function main() {
   console.log("[DEBUG] Starting SIP call...");
   const userAgent = await createUserAgent();
-  const target = "sip:08123558443@192.168.1.7"; // Adjust target
+  const target = "sip:+918123558443@sam2.pstn.twilio.com"; // Adjust target
   //const target = "sip:07977743973@192.168.1.7"; // Adjust target
   placeCall(userAgent, target);
 }
